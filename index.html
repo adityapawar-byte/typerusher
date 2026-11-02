@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TypeRush – Typing Speed Game</title>
+<style>
+:root{--bg:#f4f5fb;--sf:#fff;--tx:#1c1f33;--mu:#6b7090;--ac:#6c4cff;--ok:#12a36b;--bad:#e5384f;--bd:#dfe2f0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1020;--sf:#171a30;--tx:#e8eaff;--mu:#8a90b8;--ac:#8f78ff;--ok:#3ddc97;--bad:#ff5d73;--bd:#2a2e50;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1020;--sf:#171a30;--tx:#e8eaff;--mu:#8a90b8;--ac:#8f78ff;--ok:#3ddc97;--bad:#ff5d73;--bd:#2a2e50;color-scheme:dark}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+.wrap{max-width:960px;margin:0 auto;padding:16px}
+header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:20px}
+.logo{font-weight:800;font-size:1.4rem;letter-spacing:-.5px}.logo b{color:var(--ac)}
+nav{display:flex;gap:6px;flex-wrap:wrap}
+button,.tab{font:inherit;cursor:pointer;border:1px solid var(--bd);background:var(--sf);color:var(--tx);padding:8px 14px;border-radius:10px;text-decoration:none}
+button:hover,.tab:hover{border-color:var(--ac)}button:focus-visible,.tab:focus-visible,input:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.tab.on,button.pri{background:var(--ac);border-color:var(--ac);color:#fff}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:18px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:10px;margin-bottom:14px}
+.stat{background:var(--bg);border-radius:12px;padding:10px;text-align:center}.stat b{display:block;font-size:1.6rem;color:var(--ac)}.stat span{font-size:.75rem;color:var(--mu);text-transform:uppercase}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+#words{font:1.45rem/2.4rem ui-monospace,Menlo,Consolas,monospace;height:7.2rem;overflow:hidden;position:relative;color:var(--mu);user-select:none;cursor:text}
+.word{display:inline-block;margin-right:.7ch}.word.cur{border-bottom:2px solid var(--ac)}.word.wrong{text-decoration:underline wavy var(--bad)}
+i{font-style:normal}i.ok{color:var(--ok)}i.bad{color:var(--bad)}
+.hid{position:absolute;opacity:0;width:1px;height:1px}
+.hint{color:var(--mu);font-size:.85rem;margin-top:8px}
+#res,#over{text-align:center;padding:10px}#res h2,#over h2{margin:.2em 0}
+#arena{position:relative;height:360px;overflow:hidden;border-radius:12px;background:var(--bg);border:1px solid var(--bd)}
+.fw{position:absolute;top:0;left:0;padding:3px 10px;border-radius:8px;background:var(--sf);border:1px solid var(--ac);font:1.05rem ui-monospace,Menlo,Consolas,monospace;white-space:nowrap}
+.fw u{text-decoration:none;color:var(--ok);font-weight:700}
+.ground{position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--bad)}
+#msg{position:absolute;inset:0;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;background:color-mix(in srgb,var(--bg) 85%,transparent);text-align:center;padding:16px}
+input.txt{width:100%;padding:12px;font:1.1rem ui-monospace,Menlo,monospace;border-radius:10px;border:1px solid var(--bd);background:var(--sf);color:var(--tx);margin-top:10px}
+table{width:100%;border-collapse:collapse}th,td{padding:8px;text-align:left;border-bottom:1px solid var(--bd);font-size:.92rem}
+.scroll{overflow-x:auto}[hidden]{display:none!important}
+.warn{background:var(--bad);color:#fff;padding:8px 12px;border-radius:10px;margin-bottom:12px}
+@media(max-width:520px){#words{font-size:1.15rem;line-height:2.1rem;height:6.3rem}}
+:root{--g1:#ffe4f3;--g2:#e0e7ff;--g3:#d1fae5}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--g1:#1f0b45;--g2:#0b1e50;--g3:#093d3b}}
+:root[data-theme="dark"]{--g1:#1f0b45;--g2:#0b1e50;--g3:#093d3b}
+body{background:linear-gradient(120deg,var(--g1),var(--g2),var(--g3),var(--g1));background-size:300% 300%;animation:bgm 20s ease infinite}
+body::before,body::after{content:"";position:fixed;width:55vmax;height:55vmax;border-radius:50%;pointer-events:none;z-index:-1;filter:blur(30px)}
+body::before{left:-18vmax;top:-18vmax;background:radial-gradient(circle,#ff4d8d66,transparent 65%);animation:flt 14s ease-in-out infinite alternate}
+body::after{right:-18vmax;bottom:-18vmax;background:radial-gradient(circle,#4cc9ff66,transparent 65%);animation:flt 17s ease-in-out infinite alternate-reverse}
+.logo{background:linear-gradient(90deg,#ff4d8d,#ffb02e,#3ddc97,#4cc9ff,#8f78ff,#ff4d8d);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:bgm 6s linear infinite;font-size:1.7rem}
+.logo b{color:transparent}
+button,.tab{transition:transform .15s,box-shadow .15s,border-color .15s}
+button:hover,.tab:hover{transform:translateY(-2px);box-shadow:0 6px 16px -6px var(--ac)}button:active{transform:scale(.96)}
+.tab.on,button.pri{background:linear-gradient(135deg,#6c4cff,#ff4d8d);border-color:transparent;box-shadow:0 6px 18px -6px #ff4d8d}
+#tRe,#rGo,#again{animation:pulse 2s infinite}
+.card{border:2px solid transparent;background:linear-gradient(var(--sf),var(--sf)) padding-box,linear-gradient(135deg,#ff4d8d,#8f78ff,#4cc9ff,#3ddc97) border-box;box-shadow:0 14px 40px -16px #8f78ff}
+section:not([hidden]){animation:rise .45s ease both}
+.stat{transition:transform .2s}.stat:hover{transform:translateY(-3px) scale(1.04)}
+.stat:nth-child(1) b{color:#ff4d8d}.stat:nth-child(2) b{color:#ffb02e}.stat:nth-child(3) b{color:#3ddc97}.stat:nth-child(4) b{color:#4cc9ff}.stat:nth-child(5) b{color:#8f78ff}
+i.ok{text-shadow:0 0 8px color-mix(in srgb,var(--ok) 55%,transparent)}
+.word.cur{animation:cur 1s infinite}
+.fw{border-color:hsl(var(--h,260) 90% 60%);box-shadow:0 0 14px hsl(var(--h,260) 90% 60%/.55);animation:glow 1.6s ease-in-out infinite alternate}
+.boom{animation:boom .25s forwards!important;pointer-events:none}
+#arena.hurt{animation:shake .3s}
+#msg{backdrop-filter:blur(4px)}
+#msg:not([hidden]),#res:not([hidden]){animation:pop .45s}
+#res h2,#msg h2{background:linear-gradient(90deg,#ff4d8d,#ffb02e,#4cc9ff);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:2rem}
+.ground{background:linear-gradient(90deg,#ff4d8d,#ffb02e,#ff4d8d)}
+@keyframes bgm{0%{background-position:0 50%}50%{background-position:100% 50%}100%{background-position:0 50%}}
+@keyframes flt{to{transform:translate(8vmax,6vmax) scale(1.15)}}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}}
+@keyframes pop{from{opacity:0;transform:scale(.7)}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 #ff4d8d88}70%,100%{box-shadow:0 0 0 12px #ff4d8d00}}
+@keyframes cur{50%{border-bottom-color:transparent}}
+@keyframes glow{to{box-shadow:0 0 26px hsl(var(--h,260) 90% 60%/.9)}}
+@keyframes boom{to{opacity:0;filter:blur(6px) brightness(2)}}
+@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+@media(prefers-reduced-motion:reduce){*,::before,::after{animation:none!important;transition:none!important}}
+</style></head><body>
+<div class="wrap">
+<header><div class="logo">Type<b>Rush</b> ⚡</div>
+<nav aria-label="Main">
+<a class="tab" href="#test" data-v="test">🎯 Speed Test</a>
+<a class="tab" href="#rain" data-v="rain">🌧️ Word Rain</a>
+<a class="tab" href="#scores" data-v="scores">📊 My Stats</a>
+<button id="theme" aria-label="Toggle theme">Theme</button></nav></header>
+<div id="warn" class="warn" hidden>Saving is blocked in this browser, so scores won’t be kept.</div>
+
+<main>
+<section id="v-test" class="card">
+<div class="stats"><div class="stat"><b id="tW">0</b><span>WPM</span></div><div class="stat"><b id="tA">100%</b><span>Accuracy</span></div><div class="stat"><b id="tT">30</b><span>Seconds</span></div></div>
+<div class="row" role="group" aria-label="Duration"><span class="hint">Duration:</span>
+<button data-d="15">15s</button><button data-d="30">30s</button><button data-d="60">60s</button><button id="tRe" class="pri">Restart (Esc)</button></div>
+<div id="words" aria-live="off"></div>
+<input id="tIn" class="hid" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Type here">
+<p class="hint">Click the text and start typing. The timer starts on your first key. Press Space after each word.</p>
+<div id="res" hidden></div>
+</section>
+
+<section id="v-rain" class="card" hidden>
+<div class="stats"><div class="stat"><b id="rS">0</b><span>Score</span></div><div class="stat"><b id="rL">3</b><span>Lives</span></div><div class="stat"><b id="rV">1</b><span>Level</span></div><div class="stat"><b id="rB">0</b><span>Best</span></div></div>
+<div id="arena"><div class="ground"></div>
+<div id="msg"><h2>Word Rain</h2><p>Type each falling word before it hits the ground. Three misses and it’s over.</p><button id="rGo" class="pri">Start game</button></div></div>
+<input id="rIn" class="txt" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Type the words here…" aria-label="Type falling words">
+</section>
+
+<section id="v-scores" class="card" hidden>
+<div class="stats"><div class="stat"><b id="sB">0</b><span>Best WPM</span></div><div class="stat"><b id="sAv">0</b><span>Avg WPM</span></div><div class="stat"><b id="sN">0</b><span>Tests</span></div><div class="stat"><b id="sR">0</b><span>Rain best</span></div><div class="stat"><b id="sK" style="font-size:1.1rem;padding:.4rem 0">–</b><span>Rank</span></div></div>
+<div class="scroll"><table><thead><tr><th>Date</th><th>Time</th><th>WPM</th><th>Accuracy</th></tr></thead><tbody id="sT"></tbody></table></div>
+<p id="sE" class="hint">No tests yet. Take a speed test to see your history here.</p>
+<button id="sC">Clear all data</button>
+</section>
+</main>
+<p class="hint" style="text-align:center;margin-top:16px">Scores are stored only in this browser.</p>
+</div>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const W="the be to of and a in that have it for not on with he as you do at this but his by from they we say her she or an will my one all would there their what so up out if about who get which go me when make can like time no just him know take people into year your good some could them see other than then now look only come its over think also back after use two how our work first well way even new want because any these give day most us keyboard speed fast quick finger rhythm practice focus letter typing score level combo master power stream rocket planet jungle silver dragon pixel thunder shadow galaxy puzzle winter summer coffee garden bridge castle engine laser market orange pocket random signal travel wonder yellow".split(" ");
+const pick=()=>W[Math.random()*W.length|0];
+let store;const def=()=>({tests:[],rain:{best:0,games:0}});
+function load(){try{const s=JSON.parse(localStorage.getItem("typerush1"));if(s&&Array.isArray(s.tests)&&s.rain)return s}catch(e){}return def()}
+function save(){try{localStorage.setItem("typerush1",JSON.stringify(store))}catch(e){$("#warn").hidden=false}}
+store=load();
+const rank=w=>w>=100?"Legend":w>=70?"Ace":w>=45?"Gunner":w>=25?"Rookie":"Newbie";
+
+/* routing */
+function route(){const v=["test","rain","scores"].includes(location.hash.slice(1))?location.hash.slice(1):"test";
+$$("section").forEach(s=>s.hidden=s.id!=="v-"+v);$$(".tab").forEach(t=>t.classList.toggle("on",t.dataset.v===v));
+if(v!=="rain")rainStop();if(v==="scores")renderScores();if(v==="test")newTest()}
+addEventListener("hashchange",route);
+
+/* theme */
+$("#theme").onclick=()=>{const r=document.documentElement,d=r.dataset.theme?r.dataset.theme==="dark":matchMedia("(prefers-color-scheme:dark)").matches;r.dataset.theme=d?"light":"dark"};
+
+/* speed test */
+const T={dur:30,words:[],i:0,cur:"",t0:0,run:false,done:false,ok:0,keys:0,right:0,tm:null};
+const wEl=$("#words"),tIn=$("#tIn");
+function newTest(){clearInterval(T.tm);Object.assign(T,{words:Array.from({length:160},pick),i:0,cur:"",run:false,done:false,ok:0,keys:0,right:0});
+wEl.innerHTML=T.words.map(w=>`<span class="word">${[...w].map(c=>`<i>${c}</i>`).join("")}</span>`).join(" ");
+wEl.scrollTop=0;tIn.value="";tIn.disabled=false;$("#res").hidden=true;$("#tT").textContent=T.dur;$("#tW").textContent=0;$("#tA").textContent="100%";
+$$("[data-d]").forEach(b=>b.classList.toggle("pri",+b.dataset.d===T.dur));paint();if(!$("#v-test").hidden)tIn.focus()}
+function paint(){const ws=wEl.children;
+for(let i=0;i<ws.length;i++){ws[i].classList.toggle("cur",i===T.i)}
+const el=ws[T.i];if(!el)return;const w=T.words[T.i];
+el.innerHTML=[...w].map((c,k)=>`<i class="${k<T.cur.length?(T.cur[k]===c?"ok":"bad"):""}">${c}</i>`).join("")+[...T.cur.slice(w.length)].map(c=>`<i class="bad">${c}</i>`).join("");
+wEl.scrollTop=Math.max(0,el.offsetTop-wEl.offsetTop-wEl.clientHeight/3)}
+function liveStats(){const el=(Date.now()-T.t0)/60000,c=T.ok+[...T.cur].filter((ch,k)=>ch===T.words[T.i][k]).length;
+$("#tW").textContent=el>0?Math.round(c/5/el):0;$("#tA").textContent=(T.keys?Math.round(T.right/T.keys*100):100)+"%"}
+function tick(){const left=Math.max(0,T.dur-(Date.now()-T.t0)/1000);$("#tT").textContent=Math.ceil(left);liveStats();if(left<=0)finish()}
+tIn.addEventListener("input",e=>{if(T.done)return;
+if(!T.run){T.run=true;T.t0=Date.now();T.tm=setInterval(tick,200)}
+const v=tIn.value;
+if(e.inputType==="insertText"&&e.data&&e.data!==" "){T.keys++;if(v.length<=T.words[T.i].length&&e.data===T.words[T.i][v.length-1])T.right++}
+if(v.endsWith(" ")){const w=v.trim();if(w){if(w===T.words[T.i])T.ok+=w.length+1;wEl.children[T.i].classList.toggle("wrong",w!==T.words[T.i]);T.i++;T.cur=""}tIn.value="";
+if(T.i>=T.words.length-1){finish();return}}else T.cur=v;
+paint();liveStats()});
+function finish(){if(T.done)return;T.done=true;clearInterval(T.tm);tIn.disabled=true;
+const c=T.ok+[...T.cur].filter((ch,k)=>ch===T.words[T.i][k]).length,mins=Math.min(T.dur,(Date.now()-T.t0)/1000)/60;
+const wpm=Math.round(c/5/mins),acc=T.keys?Math.round(T.right/T.keys*100):100;
+const prevBest=Math.max(0,...store.tests.map(t=>t.wpm));
+store.tests.push({wpm,acc,dur:T.dur,t:Date.now()});store.tests=store.tests.slice(-50);save();
+const r=$("#res");r.hidden=false;r.innerHTML=`<h2>${wpm} WPM · ${acc}% accuracy</h2><p>Rank: <b>${rank(wpm)}</b>${wpm>prevBest&&store.tests.length>1?" 🏆 New personal best!":""}</p><button class="pri" id="again">Play again</button>`;
+$("#again").onclick=newTest;$("#again").focus()}
+$$("[data-d]").forEach(b=>b.onclick=()=>{T.dur=+b.dataset.d;newTest()});
+$("#tRe").onclick=newTest;wEl.onclick=()=>tIn.focus();
+addEventListener("keydown",e=>{if(e.key==="Escape"&&location.hash!=="#rain"&&location.hash!=="#scores")newTest()});
+
+/* word rain */
+const R={on:false,words:[],score:0,lives:3,lvl:1,hit:0,last:0,spawn:0,raf:0},ar=$("#arena"),rIn=$("#rIn");
+function rainStop(){R.on=false;cancelAnimationFrame(R.raf)}
+function rainStart(){rainStop();ar.querySelectorAll(".fw").forEach(n=>n.remove());Object.assign(R,{on:true,words:[],score:0,lives:3,lvl:1,hit:0,spawn:0,last:performance.now()});
+$("#msg").hidden=true;rIn.value="";rIn.disabled=false;rIn.focus();rainHud();R.raf=requestAnimationFrame(loop)}
+function rainHud(){$("#rS").textContent=R.score;$("#rL").textContent=R.lives;$("#rV").textContent=R.lvl;$("#rB").textContent=store.rain.best}
+function spawn(){const w=pick(),n=document.createElement("div");n.className="fw";n.textContent=w;n.style.setProperty("--h",Math.random()*360|0);ar.appendChild(n);
+const x=Math.random()*Math.max(10,ar.clientWidth-n.offsetWidth-10);R.words.push({w,n,x,y:-30});n.style.left=x+"px"}
+function loop(t){if(!R.on)return;const dt=Math.min(.05,(t-R.last)/1000);R.last=t;R.spawn-=dt;
+if(R.spawn<=0){spawn();R.spawn=Math.max(.8,2.4-R.lvl*.2)}
+const sp=38+R.lvl*9,H=ar.clientHeight;
+for(const o of [...R.words]){o.y+=sp*dt;o.n.style.transform=`translateY(${o.y}px)`;
+if(o.y>H-34){o.n.remove();R.words=R.words.filter(q=>q!==o);R.lives--;rainHud();ar.classList.add("hurt");setTimeout(()=>ar.classList.remove("hurt"),300);if(R.lives<=0){return over()}}}
+R.raf=requestAnimationFrame(loop)}
+function over(){rainStop();rIn.disabled=true;const nb=R.score>store.rain.best;store.rain.games++;if(nb)store.rain.best=R.score;save();rainHud();
+const m=$("#msg");m.hidden=false;m.innerHTML=`<h2>Game over</h2><p>Score <b>${R.score}</b> · Level ${R.lvl}${nb?" 🏆 New best!":""}</p><button class="pri" id="rGo2">Play again</button>`;$("#rGo2").onclick=rainStart}
+rIn.addEventListener("input",()=>{if(!R.on)return;const v=rIn.value.trim().toLowerCase();
+R.words.forEach(o=>{o.n.innerHTML=v&&o.w.startsWith(v)?`<u>${v}</u>${o.w.slice(v.length)}`:o.w});
+const o=R.words.find(q=>q.w===v);if(o){o.n.classList.add("boom");setTimeout(()=>o.n.remove(),250);R.words=R.words.filter(q=>q!==o);R.score+=o.w.length*10;R.hit++;if(R.hit%8===0)R.lvl++;rIn.value="";rainHud()}});
+$("#rGo").onclick=rainStart;
+
+/* stats */
+function renderScores(){const t=store.tests,b=$("#sT");b.innerHTML="";
+$("#sB").textContent=t.length?Math.max(...t.map(x=>x.wpm)):0;$("#sAv").textContent=t.length?Math.round(t.reduce((a,x)=>a+x.wpm,0)/t.length):0;
+$("#sN").textContent=t.length;$("#sR").textContent=store.rain.best;$("#sK").textContent=t.length?rank(+$("#sB").textContent):"–";$("#sE").hidden=t.length>0;
+[...t].reverse().slice(0,15).forEach(x=>{const r=b.insertRow();[new Date(x.t).toLocaleString(),x.dur+"s",x.wpm,x.acc+"%"].forEach(v=>r.insertCell().textContent=v)})}
+$("#sC").onclick=()=>{if(confirm("Delete all saved scores?")){store=def();save();renderScores()}};
+route();
+</script></body></html>
